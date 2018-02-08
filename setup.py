@@ -13,7 +13,7 @@ setup(
     version=get_version("chasgimqtt"),
     author="Xavier Lesa",
     author_email="xavierlesa@gmail.com",
-    url="https://github.com/ninjaotoko/channels-asgi-mqtt",
+    url="https://github.com/xavierlesa/channels-asgi-mqtt",
     description="Interface between MQTT broker and ASGI and Channels 2.0 compatible",
     long_description=open("README.rst").read(),
     license="GPLv3+",
