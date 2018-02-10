@@ -15,7 +15,7 @@ setup(
     author_email="xavierlesa@gmail.com",
     url="https://github.com/xavierlesa/channels-asgi-mqtt",
     description="Interface between MQTT broker and ASGI and Channels 2.0 compatible",
-    long_description=open("README.rst").read(),
+    long_description=open("README.md").read(),
     license="GPLv3+",
     packages=["chasgimqtt"],
     install_requires=[
