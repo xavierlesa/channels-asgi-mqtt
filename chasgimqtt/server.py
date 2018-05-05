@@ -31,11 +31,15 @@ async def mqtt_group_discard(future, channel_layer, group):
 
 
 class Server(object):
-    def __init__(self, channel, host, port, username=None, password=None):
+    def __init__(self, channel, host, port, username=None, password=None, 
+            client_id=None, topics_subscription=None, mqtt_channel_name = None, 
+            mqtt_channel_sub=None, mqtt_channel_pub=None):
+
         self.channel = channel
         self.host = host
         self.port = port
-        self.client = mqtt.Client(userdata={
+        self.client_id = client_id
+        self.client = mqtt.Client(client_id=self.client_id, userdata={
             "server": self,
             "channel": self.channel,
             "host": self.host,
@@ -46,13 +50,18 @@ class Server(object):
         self.client.on_connect = self._on_connect
         self.client.on_disconnect = self._on_disconnect
         self.client.on_message = self._on_message
-        self.mqtt_channel_pub = "mqtt.pub"
-        self.mqtt_channel_sub = "mqtt.sub"
+
+        self.topics_subscription = topics_subscription or [("#", 2),]
+        assert isinstance(self.topics_subscription, list), "Topic subscription must be a list with (topic, qos)"
+
+        self.mqtt_channel_name = mqtt_channel_name or "mqtt"
+        self.mqtt_channel_pub = mqtt_channel_pub or "mqtt.pub"
+        self.mqtt_channel_sub = mqtt_channel_sub or "mqtt.sub"
 
 
     def _on_connect(self, client, userdata, flags, rc):
         logger.info("Connected with status {}".format(rc))
-        client.subscribe("#", qos=2)
+        client.subscribe(self.topics_subscription)
 
 
     def _on_disconnect(self, client, userdata, rc):
@@ -74,7 +83,7 @@ class Server(object):
                         raise
 
     def _mqtt_send_got_result(self, future):
-        print("mqtt_send result =>", future.result())
+        logger.debug("Sending message to MQTT channel, with result\r\n%s", future.result())
 
     def _on_message(self, client, userdata, message):
         logger.debug("Received message from topic {}".format(message.topic))
@@ -94,15 +103,6 @@ class Server(object):
             "port": userdata["port"],
         }
 
-        kwargs={
-            "channel_layer": self.channel,
-            "channel": "mqtt",
-            "event": {
-                "type": "mqtt.sub", 
-                "text": msg
-                }
-            }
-
         try:
 
             future = asyncio.Future()
@@ -110,9 +110,9 @@ class Server(object):
                     mqtt_send(
                         future, 
                         self.channel, 
-                        "mqtt", 
+                        self.mqtt_channel_name,
                         {
-                            "type": "mqtt.sub", 
+                            "type": self.mqtt_channel_sub,
                             "text": msg
                         })
                 )
@@ -144,22 +144,29 @@ class Server(object):
         """
         Recibe un mensaje desde el Channel `mqtt.pub` y lo envia al broker MQTT
         """
-        #msg = future.result()
-        print(msg['text'])
-        payload = json.loads(msg['text'])
-        # Envia el mensaje al canala mqtt.pub
-        self.client.publish(payload['topic'], payload['payload'], qos=payload.get('qos', 2), retain=False)
+
+        # Solo nos interesan los messages del channel asociado al mqtt_channel_pub
+        if msg['type'] == self.mqtt_channel_pub:
+
+            payload = msg['text']
+
+            if not isinstance(payload, dict):
+                payload = json.loads(payload)
+
+            logger.info("Recibe un menssage con payload: %s", msg)
+            self.client.publish(
+                    payload['topic'], 
+                    payload['payload'], 
+                    qos=payload.get('qos', 2), 
+                    retain=False)
 
 
     async def client_pool_message(self):
-        #future = asyncio.Future()
-        #future.add_done_callback(self._mqtt_receive)
         logger.info("Loop de recepción de messages")
 
         while True:
-            logger.info("Espera recibir un message")
-            result = await self.channel.receive(self.mqtt_channel_pub) 
-            #future.set_result(result)
+            logger.info("Espera recibir un message desde el channel %s", self.mqtt_channel_name)
+            result = await self.channel.receive(self.mqtt_channel_name)
             self._mqtt_receive(result)
             await asyncio.sleep(0.1)
             
