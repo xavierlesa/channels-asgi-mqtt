@@ -1,0 +1,14 @@
+
+
+0.3.0 (2018-10-27)
+------------------
+* Add --channel-name to send and receive messages from a custom channel name
+* Add --channel-sub to customize where to subscribe
+* Add --channel-pub to customize where to publish
+* Remove logs in the loop
+* Add log level for DEBUG
+
+
+0.2.1 (2018-05-05)
+------------------
+* first release
