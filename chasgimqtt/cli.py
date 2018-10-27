@@ -40,13 +40,13 @@ def main():
                     --topic /office/sensor:0 --topic /home/sensor:1 \
                     If empty (#, 2) is set as default")
 
-    parser.add_argument("-n", "--channel-name", 
+    parser.add_argument("-n", "--channel-name",
             help="Name of Channels's channel to send and receive messages")
 
-    parser.add_argument("-s", "--channel-sub", 
+    parser.add_argument("-s", "--channel-sub",
             help="Name of Channels's channel for MQTT Sub messages, default is mqtt.pub")
 
-    parser.add_argument("-x", "--channel-pub", 
+    parser.add_argument("-x", "--channel-pub",
             help="Name of Channels's channel for MQTT Pub messages, default is mqtt.sub")
 
     args = parser.parse_args()
@@ -55,6 +55,7 @@ def main():
         level={
             0: logging.WARN,
             1: logging.INFO,
+            2: logging.DEBUG,
         }.get(args.verbosity, logging.DEBUG),
         format="%(asctime)-15s %(levelname)-8s %(message)s",
     )

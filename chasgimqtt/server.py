@@ -136,7 +136,7 @@ class Server(object):
 
         while True:
             self.client.loop(0.1)
-            logger.debug("Restarting loop")
+            #logger.debug("Restarting loop")
             await asyncio.sleep(0.1)
 
 
