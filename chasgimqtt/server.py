@@ -18,13 +18,13 @@ async def mqtt_group_send(future, channel_layer, group, event):
     result  = await channel_layer.group_send(group, event)
     future.set_result(result)
 
-# Solo para grupos
+# Only for groups
 async def mqtt_group_add(future, channel_layer, group):
     channel_layer.channel_name = channel_layer.channel_name or await channel_layer.new_channel()
     result = await channel_layer.group_add(group, channel_layer.channel_name)
     future.set_result(result)
 
-# Solo para grupos
+# Only for groups
 async def mqtt_group_discard(future, channel_layer, group):
     result = await channel_layer.group_discard(group, channel_layer.channel_name)
     future.set_result(result)
@@ -83,7 +83,10 @@ class Server(object):
                         raise
 
     def _mqtt_send_got_result(self, future):
-        logger.debug("Sending message to MQTT channel, with result\r\n%s", future.result())
+        logger.debug("Sending message to MQTT channel.")
+        result = future.result()
+        if result:
+            logger.debug("Result: %s", result)
 
     def _on_message(self, client, userdata, message):
         logger.debug("Received message from topic {}".format(message.topic))
@@ -92,9 +95,12 @@ class Server(object):
         try:
             payload = json.loads(payload)
         except:
-            logger.debug("Payload is nos a JSON Serializable\r\n%s", payload)
+            logger.debug("Payload is nos a JSON Serializable")
             pass
+        
+        logger.debug("Raw message {}".format(payload))
 
+        # Compose a message for Channel with raw data received from MQTT
         msg = {
             "topic": message.topic,
             "payload": payload,
@@ -104,7 +110,7 @@ class Server(object):
         }
 
         try:
-
+            # create a coroutine and send
             future = asyncio.Future()
             asyncio.ensure_future(
                     mqtt_send(
@@ -117,16 +123,18 @@ class Server(object):
                         })
                 )
 
+            # attach callback for logs only
             future.add_done_callback(self._mqtt_send_got_result)
 
-            
         except Exception as e:
             logger.error("Cannot send message {}".format(msg))
             logger.exception(e)
 
 
     async def client_pool_start(self):
-        # Loop para recibir mensajes MQTT
+        """
+        This is the main loop pool for receiving MQTT messages
+        """
         if self.username:
             self.client.username_pw_set(username=self.username, password=self.password)
         
@@ -142,10 +150,10 @@ class Server(object):
 
     def _mqtt_receive(self, msg):
         """
-        Recibe un mensaje desde el Channel `mqtt.pub` y lo envia al broker MQTT
+        Receive a menssaje from Channel `mqtt.pub` and send it to MQTT broker
         """
-
-        # Solo nos interesan los messages del channel asociado al mqtt_channel_pub
+        logger.info("Receive raw messages:\r\n%s", msg)
+        # We only listen for messages from mqtt_channel_pub
         if msg['type'] == self.mqtt_channel_pub:
 
             payload = msg['text']
@@ -153,7 +161,7 @@ class Server(object):
             if not isinstance(payload, dict):
                 payload = json.loads(payload)
 
-            logger.info("Recibe un menssage con payload: %s", msg)
+            logger.info("Receive a menssage with payload:\r\n%s", msg)
             self.client.publish(
                     payload['topic'], 
                     payload['payload'], 
@@ -162,14 +170,11 @@ class Server(object):
 
 
     async def client_pool_message(self):
-        logger.info("Loop de recepción de messages")
+        logger.info("Loop for messages pool")
 
         while True:
-            logger.info("Espera recibir un message desde el channel %s", self.mqtt_channel_name)
-            result = await self.channel.receive(self.mqtt_channel_name)
-            self._mqtt_receive(result)
-            await asyncio.sleep(0.1)
-            
+            logger.info("Wait for a message from channel %s", self.mqtt_channel_name)
+            self._mqtt_receive(await self.channel.receive(self.mqtt_channel_name))
 
     def stop_server(self, signum):
         logger.info("Received signal {}, terminating".format(signum))
@@ -192,7 +197,6 @@ class Server(object):
 
         print("Event loop running forever, press Ctrl+C to interrupt.")
         print("pid %s: send SIGINT or SIGTERM to exit." % os.getpid())
-
 
         tasks = asyncio.gather(*[
                 asyncio.ensure_future(self.client_pool_start()),
