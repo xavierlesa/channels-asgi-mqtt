@@ -9,10 +9,10 @@ class MqttConsumer(SyncConsumer):
         topic = event['text']['topic']
         payload = event['text']['payload']
         # do something with topic and payload
-        print(f"topic: {topic}, payload: {payload}")
+        print("topic: {0}, payload: {1}".format(topic, payload))
 
     def mqtt_pub(self, event):
         topic = event['text']['topic']
         payload = event['text']['payload']
         # do something with topic and payload
-        print(f"topic: {topic}, payload: {payload}")
+        print("topic: {0}, payload: {1}".format(topic, payload))
