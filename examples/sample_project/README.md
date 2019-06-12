@@ -94,3 +94,9 @@ Follow the steps below to run it:
     ```bash
     python3 manage.py runworker mqtt
     ```
+
+1. and publish a message:
+
+    ```bash
+    mosquitto_pub -h iot.eclipse.org -p 1883 -t some_topic -m 1
+    ```
