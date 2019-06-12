@@ -16,7 +16,7 @@ Follow the steps below to run it:
         ```bash
         docker run -p 6379:6379 -d redis:2.8
         ```
-   - add the following to mysite/setting.py
+   - add the following to `mysite/settings.py`:
      
             ASGI_APPLICATION = 'mysite.routing.application'
             CHANNEL_LAYERS = {
