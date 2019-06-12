@@ -70,7 +70,19 @@ Follow the steps below to run it:
                 }
             )
         })
-        
+
+1. setup Django application:
+
+   ```bash
+   python manage.py migrate
+   ```
+   
+   and run it:
+   
+   ```bash
+   python manage.py runserver
+   ```
+
 1. run `chasgimqtt`:
 
     ```bash
