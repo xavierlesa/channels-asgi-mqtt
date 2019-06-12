@@ -86,7 +86,7 @@ Follow the steps below to run it:
 1. run `chasgimqtt`:
 
     ```bash
-    chasgimqtt -H iot.eclipse.org -p 1883 --topic=some_topic:2 your_channel_application.asgi:channel_layer
+    chasgimqtt -H iot.eclipse.org -p 1883 --topic=some_topic:2 mysite.asgi:channel_layer
     ```
 
 1. run the [workers](https://channels.readthedocs.io/en/latest/topics/worker.html#worker-and-background-tasks):
