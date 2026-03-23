@@ -29,7 +29,7 @@ setup(
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
-        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+        'License :: OSI Approved :: GNU Affero General Public License v3 (AGPLv3)',
         'Framework :: Django',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
