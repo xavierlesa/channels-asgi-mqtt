@@ -101,3 +101,8 @@ To subscribe to a list of topics use the same option `--topic`.
 
 **CHANNEL_PUB** : Name of Channels's channel for MQTT Pub messages, default is `mqtt.pub`.
 
+
+## License
+
+Open source projects: [AGPL-3.0](LICENSE)  
+Commercial / proprietary projects: [Commercial License](COMMERCIAL_LICENSE.md)

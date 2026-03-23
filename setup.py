@@ -16,7 +16,7 @@ setup(
     url="https://github.com/xavierlesa/channels-asgi-mqtt",
     description="Interface between MQTT broker and ASGI and Channels 2.0 compatible",
     long_description=open("README.md").read(),
-    license="GPLv3+",
+    license="AGPL-3.0",
     packages=["chasgimqtt"],
     install_requires=[
         "paho-mqtt",
