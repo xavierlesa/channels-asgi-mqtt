@@ -2,11 +2,9 @@ import os.path
 import re
 from setuptools import setup
 
-
 def get_version(package):
     init_py = open(os.path.join(package, '__init__.py')).read()
     return re.search("^__version__ = ['\"]([^'\"]+)['\"]", init_py).group(1)
-
 
 setup(
     name="chasgimqtt",
@@ -16,6 +14,7 @@ setup(
     url="https://github.com/xavierlesa/channels-asgi-mqtt",
     description="Interface between MQTT broker and ASGI and Channels 2.0 compatible",
     long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
     license="AGPL-3.0",
     packages=["chasgimqtt"],
     install_requires=[
@@ -29,7 +28,7 @@ setup(
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
-        'License :: OSI Approved :: GNU Affero General Public License v3 (AGPLv3)',
+        'License :: OSI Approved :: GNU Affero General Public License v3',
         'Framework :: Django',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
@@ -39,4 +38,4 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Topic :: Internet :: WWW/HTTP',
     ]
-)
+    )
